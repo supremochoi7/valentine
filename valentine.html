@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine?</title>
+<style>
+    body {
+        background-image: url('background.jpg'); /* initial background */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        transition: background-image 1s ease-in-out;
+    }
+
+    /* Closed overlay */
+    #cardOverlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 2rem;
+        cursor: pointer;
+        z-index: 1000;
+        text-align: center;
+        padding: 20px;
+    }
+
+    /* Card container */
+    #card {
+        position: relative;
+        text-align: center;
+        color: #fff;
+        z-index: 2;
+        width: 400px;
+        max-width: 90%;
+        padding: 30px;
+        background: rgba(0,0,0,0.5); 
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 15px 30px;
+        margin: 15px;
+        font-size: 1.5rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    #yesBtn {
+        background-color: #ff4d6d;
+        color: white;
+    }
+
+    #noBtn {
+        background-color: #ccc;
+        color: #333;
+        position: relative;
+    }
+
+    /* Fireworks */
+    .firework {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: explode 1s forwards;
+        z-index: 3;
+    }
+
+    @keyframes explode {
+        0% { transform: scale(0); opacity: 1; }
+        100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* Hearts */
+    .heart {
+        position: absolute;
+        font-size: 2.5rem;
+        animation: floatUp 4s forwards;
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    @keyframes floatUp {
+        0% { transform: translateY(0) scale(1); opacity:1; }
+        100% { transform: translateY(-500px) scale(1.5); opacity:0; }
+    }
+
+    #finalMessage {
+        font-size: 1.8rem;
+        margin-top: 20px;
+        display: none;
+        z-index: 2;
+    }
+
+    @media (max-width: 700px) {
+        #card {
+            width: 90%;
+            padding: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 1.2rem;
+        }
+    }
+
+</style>
+</head>
+<body>
+
+<!-- Closed card overlay -->
+<div id="cardOverlay">Tap to Open Your Valentine 💌</div>
+
+<!-- Main card -->
+<div id="card" style="display:none;">
+    <h1>Will you be my Valentine?</h1>
+    <button class="btn" id="yesBtn">Yes</button>
+    <button class="btn" id="noBtn">No</button>
+
+    <div id="finalMessage">I get to spend Valentine’s Day with my favorite person — and celebrate you too, birthday girl! I love you ❤️</div>
+</div>
+
+<audio id="music" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const cardOverlay = document.getElementById('cardOverlay');
+const card = document.getElementById('card');
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const finalMessage = document.getElementById('finalMessage');
+const music = document.getElementById('music');
+
+// 10 photos for background slideshow
+const photos = [
+    'photo1.jpg','photo2.jpg','photo3.jpg','photo4.jpg','photo5.jpg',
+    'photo6.jpg','photo7.jpg','photo8.jpg','photo9.jpg','photo10.jpg'
+];
+
+// Show card after overlay tap
+cardOverlay.addEventListener('click', () => {
+    cardOverlay.style.display = 'none';
+    card.style.display = 'block';
+});
+
+// NO button runs away
+noBtn.addEventListener('mouseenter', () => {
+    const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+    const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+    noBtn.style.position = 'absolute';
+    noBtn.style.left = x + 'px';
+    noBtn.style.top = y + 'px';
+});
+
+// YES button click
+yesBtn.addEventListener('click', () => {
+    yesBtn.style.transform = 'scale(1.3)';
+    music.play();
+
+    // Fireworks & hearts for 10 seconds
+    let endTime = Date.now() + 10000;
+    let interval = setInterval(() => {
+        if(Date.now() > endTime) { clearInterval(interval); return; }
+
+        for(let i=0;i<10;i++){
+            const f = document.createElement('div');
+            f.classList.add('firework');
+            f.style.background = `hsl(${Math.random()*360},100%,50%)`;
+            f.style.width = f.style.height = Math.random()*20 + 10 + 'px';
+            f.style.left = Math.random()*window.innerWidth + 'px';
+            f.style.top = Math.random()*window.innerHeight + 'px';
+            document.body.appendChild(f);
+            setTimeout(()=>f.remove(),1000);
+
+            const h = document.createElement('div');
+            h.classList.add('heart');
+            h.innerHTML = '❤️';
+            h.style.left = Math.random()*window.innerWidth + 'px';
+            h.style.animationDelay = (Math.random()*2)+'s';
+            document.body.appendChild(h);
+            setTimeout(()=>h.remove(),4000);
+        }
+    }, 800);
+
+    // Background slideshow
+    let current = 0;
+    document.body.style.backgroundImage = `url('${photos[0]}')`;
+    setInterval(() => {
+        current = (current + 1) % photos.length;
+        document.body.style.backgroundImage = `url('${photos[current]}')`;
+    }, 1500);
+
+    // Show final message
+    finalMessage.style.display = 'block';
+});
+</script>
+
+</body>
+</html>
